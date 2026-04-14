@@ -1,0 +1,35 @@
+<mjml>
+  <mj-head>
+    <mj-preview>Your Application Package license is active</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="Arial, Helvetica, sans-serif"></mj-all>
+      <mj-text font-size="14px" line-height="22px" color="#222222"></mj-text>
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f6f6f6">
+    <mj-section>
+      <mj-column background-color="#ffffff" padding="24px">
+        <mj-text>Hi there,</mj-text>
+        <mj-text>
+          We would like to kindly inform that your
+          <strong>Application Package License</strong> is active.
+        </mj-text>
+
+        <mj-text>License key: {{{ license_key }}}</mj-text>
+        <mj-text>
+          The key should be added to the monitored applications as an environment
+          variable: <strong>ONESDK_LICENSE</strong>.
+        </mj-text>
+        <mj-text>
+          Current available version:
+          <strong>{{ app_package_max_version }}</strong>.
+        </mj-text>
+        <mj-text>The license will expire in {{ days_to_expire }} days.</mj-text>
+        <mj-text>Expiration date: {{ expiration_date }}</mj-text>
+
+        <mj-text align="right">Best Regards,</mj-text>
+        <mj-text align="right">Support Team</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

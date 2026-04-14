@@ -1,0 +1,149 @@
+{
+  "version": "0.3.0",
+  "configurations": [
+    {
+      "name": "FastAPI (Uvicorn - debug friendly)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app.license_manager.api.main:create_app",
+        "--factory",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "subProcess": true,
+      "jinja": true,
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "console": "integratedTerminal",
+      // "postDebugTask": "kill:8000:graceful"
+    },
+    {
+      "name": "FastAPI (Uvicorn - reload)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "app.license_manager.api.main:create_app",
+        "--factory",
+        "--reload",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "subProcess": true,
+      "jinja": true,
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "console": "integratedTerminal",
+      // "postDebugTask": "kill:8000:graceful"
+    },
+    {
+      "name": "FastAPI (Gunicorn - debug friendly)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "gunicorn",
+      "args": [
+        "-k",
+        "uvicorn.workers.UvicornWorker",
+        "app.license_manager.api.main:create_app()",
+        "--bind",
+        "0.0.0.0:8000",
+        "--workers",
+        "1",
+        "--threads",
+        "1",
+        "--graceful-timeout",
+        "30",
+        "--timeout",
+        "60"
+      ],
+      "subProcess": true,
+      "jinja": true,
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "console": "integratedTerminal",
+      // "postDebugTask": "kill:8000:graceful"
+    },
+    {
+      "name": "Python: Celery worker",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "args": [
+        "-A",
+        "app.license_manager.tasks.celery_app.celery_app",
+        "worker",
+        "-l",
+        "info",
+        "-n",
+        "celery@0.0.0.0"
+      ],
+      "subProcess": true,
+      "jinja": true,
+      // "postDebugTask": "kill:celery:worker:graceful"
+    },
+    {
+      "name": "Python: Celery worker (solo - local)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "args": [
+        "-A",
+        "app.license_manager.tasks.celery_app.celery_app",
+        "worker",
+        "-l",
+        "info",
+        "-P",
+        "solo",
+        "-c",
+        "1",
+        "-n",
+        "celery@0.0.0.0"
+      ],
+      "subProcess": true,
+      "jinja": true,
+      // "postDebugTask": "kill:celery:worker:graceful"
+    },
+    {
+      "name": "Python: Celery beat",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "args": [
+        "-A",
+        "app.license_manager.tasks.celery_app.celery_app",
+        "beat",
+        "-l",
+        "info"
+      ],
+      "subProcess": true,
+      "jinja": true,
+      // "postDebugTask": "kill:celery:beat:graceful"
+    },
+    {
+      "name": "Python: Celery flower",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/settings.dev.env",
+      "args": [
+        "-A",
+        "app.license_manager.tasks.celery_app.celery_app",
+        "flower",
+        "--broker=amqp://guest:guest@10.224.0.13:5672/ph-dev",
+        "--port=5555"
+      ],
+      "subProcess": true,
+      "postDebugTask": "kill:flower:5555:graceful"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore virtual environments
+.venv
+env/
+venv/
+ENV/
+
+# Ignore git / VCS
+.git
+.gitignore
+
+# Ignore Dockerfiles for other services if not needed
+docker-compose.override.yml
+
+# Ignore development configs
+.vscode/
+.idea/
+
+# Ignore test artifacts
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+coverage.xml
+htmlcov/
+tests/
+
+# Ignore local env
+.env
+.env.*
+
+# Ignore dist/build
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Ignore docs build
+docs/_build/
+
+# Local settings
+settings.dev.env
+
+# Deploy templates
+deploy/
+
+# Dockerfiles
+docker/
+
+# Config templates
+config/
+
+# Exclude dev/build files from image context
+.dockerignore
+.editorconfig
+.pre-commit-config.yaml
+Makefile
+run-Build_Docker_images*.sh

@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "kill:8000:graceful",
+      "type": "shell",
+      "command": "lsof -t -i tcp:8000 | xargs -r kill -TERM",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:8000:hard",
+      "type": "shell",
+      "command": "lsof -t -i tcp:8000 | xargs -r kill -KILL",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:celery:worker:graceful",
+      "type": "shell",
+      "command": "pkill -TERM -f \"celery .* -A app\\.license_manager\\.tasks\\.celery_app\\.celery_app .* worker\" || true",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:celery:beat:graceful",
+      "type": "shell",
+      "command": "pkill -TERM -f \"celery .* -A app\\.license_manager\\.tasks\\.celery_app\\.celery_app .* beat\" || true",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:flower:5555:graceful",
+      "type": "shell",
+      "command": "lsof -t -i tcp:5555 | xargs -r kill -TERM",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:celery:worker:hard",
+      "type": "shell",
+      "command": "pkill -KILL -f \"celery .* -A app\\.license_manager\\.tasks\\.celery_app\\.celery_app .* worker\" || true",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:celery:beat:hard",
+      "type": "shell",
+      "command": "pkill -KILL -f \"celery .* -A app\\.license_manager\\.tasks\\.celery_app\\.celery_app .* beat\" || true",
+      "problemMatcher": []
+    },
+    {
+      "label": "kill:flower:5555:hard",
+      "type": "shell",
+      "command": "lsof -t -i tcp:5555 | xargs -r kill -KILL",
+      "problemMatcher": []
+    }
+  ]
+}

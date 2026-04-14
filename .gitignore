@@ -1,0 +1,111 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Logs
+*.log
+*.log.rotated
+*.log.*
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Environments
+settings.dev.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-selfcheck.json
+
+# IDEs and editors
+.idea/
+# .vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# celery
+celerybeat-schedule*
+celerybeat.pid
+
+# MongoDB / SQLite / other DB data
+*.db
+*.sqlite
+mongo_data/
+rabbitmq_data/
+
+# Docker
+**/__pycache__/
+*.pid
+docker/*/*.pid
+
+# Local settings
+*.env
+
+# secrets
+secrets/*
+
+# test app
+test.py
+
+# Helm specific
+charts/
+.helmignore
+
+# Build artifacts
+*.tgz
+
+# dummy_data
+dummy_data/
+
+# SonarQube
+.scannerwork/
+.sonarlint/
+
+# temp files
+temp/
+
+# test writing instructions
+TESTS.md
