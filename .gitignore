@@ -109,3 +109,6 @@ temp/
 
 # test writing instructions
 TESTS.md
+
+# openapi spec
+openapi.json
