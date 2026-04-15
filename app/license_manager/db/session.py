@@ -6,12 +6,21 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy.schema import CreateSchema
 
 from app.license_manager.core.settings import get_settings
 from app.license_manager.db.base import Base
 
 _engine: AsyncEngine | None = None
 AsyncSessionLocal: async_sessionmaker[AsyncSession] | None = None
+
+
+def _get_declared_schemas() -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            {table.schema for table in Base.metadata.tables.values() if table.schema}
+        )
+    )
 
 
 def get_engine() -> AsyncEngine:
@@ -46,4 +55,6 @@ async def init_db() -> None:
     """
     engine = get_engine()
     async with engine.begin() as conn:
+        for schema_name in _get_declared_schemas():
+            await conn.execute(CreateSchema(schema_name, if_not_exists=True))
         await conn.run_sync(Base.metadata.create_all)
