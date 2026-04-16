@@ -15,6 +15,7 @@ import {
   setAuthFailureHandler,
 } from "./auth-session";
 import { AuthContext, type AuthContextValue } from "./auth-context";
+import { AuthScreen } from "../components/auth/AuthScreen";
 import { ErrorState, LoadingState } from "../components/common";
 
 type AuthState = {
@@ -250,10 +251,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   if (!authState.isInitialized) {
     return (
-      <LoadingState
-        title="Initializing authentication"
-        description="Connecting to Keycloak and restoring your session."
-      />
+      <AuthScreen size="wide">
+        <LoadingState
+          title="Initializing authentication"
+          description="Connecting to Keycloak and restoring your session."
+        />
+      </AuthScreen>
     );
   }
 
@@ -263,7 +266,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     window.location.pathname !== "/login"
   ) {
     return (
-      <ErrorState title="Authentication Setup Error" description={authError} />
+      <AuthScreen size="wide">
+        <ErrorState
+          title="Authentication Setup Error"
+          description={authError}
+        />
+      </AuthScreen>
     );
   }
 

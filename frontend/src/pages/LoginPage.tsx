@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth";
+import { AuthScreen } from "../components/auth/AuthScreen";
 import { LoadingState } from "../components/common";
 
 type LoginLocationState = {
@@ -30,10 +31,12 @@ export function LoginPage() {
 
   if (!isInitialized) {
     return (
-      <LoadingState
-        title="Preparing sign-in"
-        description="Checking for an existing Keycloak session."
-      />
+      <AuthScreen size="wide">
+        <LoadingState
+          title="Preparing sign-in"
+          description="Checking for an existing Keycloak session."
+        />
+      </AuthScreen>
     );
   }
 
@@ -42,23 +45,29 @@ export function LoginPage() {
   }
 
   return (
-    <section className="login-page">
-      <div className="login-page__card">
-        <span className="login-page__pill">Keycloak Authentication</span>
-        <h1>Sign in to License Manager</h1>
-        <p>
-          Use your organization account to continue. You will be redirected to
-          the Keycloak login screen.
-        </p>
-        {error ? <p role="alert">{error}</p> : null}
-        <button
-          className="login-page__button"
-          type="button"
-          onClick={() => void login(redirectPath)}
-        >
-          Continue with Keycloak
-        </button>
-      </div>
-    </section>
+    <AuthScreen>
+      <section className="login-page">
+        <div className="login-page__card">
+          <span className="login-page__pill">Keycloak Authentication</span>
+          <h1>Sign in to License Manager</h1>
+          <p>
+            Use your organization account to continue. You will be redirected to
+            the Keycloak login screen.
+          </p>
+          {error ? (
+            <p className="login-page__error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <button
+            className="login-page__button"
+            type="button"
+            onClick={() => void login(redirectPath)}
+          >
+            Continue with Keycloak
+          </button>
+        </div>
+      </section>
+    </AuthScreen>
   );
 }

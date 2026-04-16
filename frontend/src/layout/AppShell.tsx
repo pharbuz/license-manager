@@ -22,6 +22,11 @@ import { navItems } from "../app/routes";
 import { useAuth } from "../auth";
 import { PageTransition } from "../components/common";
 import { getHealth } from "../services";
+import {
+  applyDarkModeClass,
+  persistDarkMode,
+  readStoredDarkMode,
+} from "../utils/theme";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { UserMenu } from "./UserMenu";
 import "./app-shell.css";
@@ -68,20 +73,7 @@ export function AppShell() {
     return storage.getItem("sidebarCollapsed") === "true";
   });
   const [isDark, setIsDark] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    const storage = window.localStorage;
-    if (!storage || typeof storage.getItem !== "function") {
-      return document.documentElement.classList.contains("dark");
-    }
-
-    const saved = storage.getItem("darkMode");
-    if (saved === null) {
-      return document.documentElement.classList.contains("dark");
-    }
-    return saved === "true";
+    return readStoredDarkMode();
   });
   const { roles, user } = useAuth();
   const healthQuery = useQuery({
@@ -91,16 +83,8 @@ export function AppShell() {
   });
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    const storage = window.localStorage;
-    if (storage && typeof storage.setItem === "function") {
-      storage.setItem("darkMode", String(isDark));
-    }
+    applyDarkModeClass(isDark);
+    persistDarkMode(isDark);
   }, [isDark]);
 
   useEffect(() => {
