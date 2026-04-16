@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { ApiError } from "../api";
 import { ConfirmDialog, FormModal, Modal } from "../components/modals";
-import { PageContainer } from "../components/common";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  PageContainer,
+} from "../components/common";
 import {
   createSmtpCredentials,
   deleteSmtpCredentials,
@@ -73,6 +78,8 @@ export function SmtpCredentialsPage() {
   });
 
   const item = query.data ?? null;
+  const missingCredentials = query.isError && query.error?.status === 404;
+  const hasUnexpectedError = query.isError && !missingCredentials;
 
   return (
     <PageContainer
@@ -108,9 +115,18 @@ export function SmtpCredentialsPage() {
     >
       <section className="feature-scaffold__card">
         {query.isLoading ? (
-          <p>Loading SMTP credentials...</p>
-        ) : query.isError ? (
-          <p>{query.error?.message}</p>
+          <LoadingState
+            title="Loading SMTP credentials"
+            description="Checking whether an outgoing mail configuration is already available."
+          />
+        ) : hasUnexpectedError ? (
+          <ErrorState
+            title="Unable to load SMTP credentials"
+            description={
+              query.error?.message ??
+              "SMTP configuration could not be loaded from the API."
+            }
+          />
         ) : item ? (
           <dl className="lm-details">
             <div>
@@ -143,7 +159,10 @@ export function SmtpCredentialsPage() {
             </div>
           </dl>
         ) : (
-          <p>No SMTP credentials configured yet.</p>
+          <EmptyState
+            title="No SMTP credentials configured"
+            description="Create credentials to enable outgoing notification emails."
+          />
         )}
       </section>
 

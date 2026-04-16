@@ -141,3 +141,21 @@ p {
 .animate-page-enter {
   animation: page-enter 0.25s ease-out forwards;
 }
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-35%);
+  }
+
+  50% {
+    transform: translateX(10%);
+  }
+
+  100% {
+    transform: translateX(35%);
+  }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 1.4s ease-in-out infinite;
+}
