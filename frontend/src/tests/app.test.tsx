@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "../app/app";
 import * as services from "../services";
@@ -21,6 +22,7 @@ describe("Stage 1 bootstrap", () => {
     render(<App />);
 
     expect(await screen.findByText("License Manager")).toBeInTheDocument();
+    expect(await screen.findByText("System status")).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", { name: "Dashboard" }),
     ).toBeInTheDocument();
@@ -38,5 +40,16 @@ describe("Stage 1 bootstrap", () => {
     expect(
       await screen.findByRole("link", { name: "Audit Logs" }),
     ).toBeInTheDocument();
+  });
+
+  it("opens the user dropdown menu", async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(await screen.findByRole("button", { name: "User menu" }));
+
+    expect(await screen.findByText(/Dark mode|Light mode/)).toBeInTheDocument();
+    expect(await screen.findByText("Logout")).toBeInTheDocument();
   });
 });
