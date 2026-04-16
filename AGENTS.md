@@ -1,5 +1,10 @@
 # AGENTS
 
+## Frontend scope
+
+For any work in `frontend/`, follow only `frontend/AGENTS.md`.
+Do not apply frontend-specific instructions from this root `AGENTS.md` to files under `frontend/`.
+
 ## Formatting and linting
 
 After each implementation, run these commands:
