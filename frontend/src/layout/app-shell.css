@@ -505,13 +505,21 @@
     transform 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    background-color 0.2s ease;
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .lm-button:hover {
   transform: translateY(-1px);
-  border-color: rgba(107, 114, 128, 0.22);
-  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.08);
+  border-color: rgba(59, 130, 246, 0.35);
+  background: #eff6ff;
+  color: #1d4ed8;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.16);
+}
+
+.lm-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
 }
 
 .lm-button:focus-visible,
@@ -532,10 +540,28 @@
   box-shadow: 0 14px 24px rgba(23, 50, 82, 0.18);
 }
 
+.lm-button--primary:hover {
+  border-color: rgba(37, 99, 235, 0.45);
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.32);
+}
+
+.lm-button--primary:active {
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+}
+
 .lm-button--danger {
   border-color: rgba(185, 28, 28, 0.2);
   background: linear-gradient(180deg, #fde2e2, #fbd5d5);
   color: #b91c1c;
+}
+
+.lm-button--danger:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: linear-gradient(180deg, #fee2e2, #fecaca);
+  color: #991b1b;
+  box-shadow: 0 10px 18px rgba(185, 28, 28, 0.14);
 }
 
 .lm-details {
@@ -799,6 +825,36 @@
 .dark .lm-details dd,
 .dark .lm-form__field span {
   color: #e5e7eb;
+}
+
+.dark .lm-button {
+  background: #111827;
+  color: #e5e7eb;
+  border-color: rgba(75, 85, 99, 0.65);
+}
+
+.dark .lm-button:hover {
+  background: rgba(37, 99, 235, 0.2);
+  color: #bfdbfe;
+  border-color: rgba(59, 130, 246, 0.55);
+  box-shadow: 0 10px 18px rgba(2, 6, 23, 0.5);
+}
+
+.dark .lm-button--primary {
+  background: linear-gradient(180deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border-color: rgba(59, 130, 246, 0.55);
+}
+
+.dark .lm-button--primary:hover {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  color: #fff;
+}
+
+.dark .lm-button--danger {
+  background: rgba(127, 29, 29, 0.45);
+  color: #fecaca;
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .lm-dashboard-health {

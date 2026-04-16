@@ -114,7 +114,6 @@ export function DashboardPage() {
       <section className="lm-dashboard-health" aria-label="Health summary">
         <div>
           <h2>System status: {statusLabel}</h2>
-          <p>Live signal from the `/health` endpoint.</p>
         </div>
 
         <ul className="lm-dashboard-service-list">
