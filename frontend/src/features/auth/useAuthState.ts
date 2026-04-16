@@ -1,11 +1,14 @@
+import { useAuth } from "../../auth";
+
 export type AuthState = {
   isAuthenticated: boolean;
   isLoading: boolean;
 };
 
 export function useAuthState(): AuthState {
+  const { isAuthenticated, isInitialized } = useAuth();
   return {
-    isAuthenticated: true,
-    isLoading: false,
+    isAuthenticated,
+    isLoading: !isInitialized,
   };
 }

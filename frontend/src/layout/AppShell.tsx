@@ -2,11 +2,13 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { navItems } from "../app/routes";
+import { useAuth } from "../auth";
 import "./app-shell.css";
 
 export function AppShell() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
   const currentSection =
     navItems.find((item) =>
       item.to === "/"
@@ -83,6 +85,19 @@ export function AppShell() {
           <div className="lm-shell__status">
             <span className="lm-shell__status-dot" />
             Connected to License Manager API
+          </div>
+
+          <div className="lm-shell__auth">
+            <span className="lm-shell__user">
+              {user?.name ?? user?.username ?? "Authenticated user"}
+            </span>
+            <button
+              className="lm-shell__logout"
+              type="button"
+              onClick={() => void logout()}
+            >
+              Logout
+            </button>
           </div>
         </header>
 

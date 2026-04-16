@@ -78,7 +78,7 @@ class HealthCheckService:
 
         try:
             repository = SmtpCredentialRepository()
-            probe_secret_name = "__license-manager-healthcheck-probe__"
+            probe_secret_name = "license-manager-healthcheck-probe"
             await to_thread(repository.client.get_secret, probe_secret_name)
             return True, None
         except Exception as exc:

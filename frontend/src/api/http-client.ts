@@ -4,6 +4,8 @@ import axios, {
   type AxiosRequestConfig,
   type AxiosResponse,
 } from "axios";
+import { ensureFreshToken } from "../auth/auth-session";
+import { readApiBaseUrl } from "../config/env";
 
 export type QueryPrimitive = string | number | boolean | Date;
 export type QueryParamValue =
@@ -87,7 +89,7 @@ export function normalizeAxiosError(error: unknown): ApiError {
   };
 }
 
-const baseURL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const baseURL = readApiBaseUrl();
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL,
@@ -96,7 +98,7 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(async (config) => {
   const headers = config.headers;
   headers.set("Accept", "application/json");
 
@@ -104,9 +106,11 @@ apiClient.interceptors.request.use((config) => {
     headers.set("Content-Type", "application/json");
   }
 
-  const token = localStorage.getItem("lm.accessToken");
-  if (token && !headers.has("Authorization")) {
-    headers.set("Authorization", `Bearer ${token}`);
+  if (!headers.has("Authorization")) {
+    const token = await ensureFreshToken();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
   }
 
   return config;

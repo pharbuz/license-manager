@@ -1,11 +1,18 @@
-import type { AxiosResponse } from "axios";
+import { AxiosHeaders, type AxiosResponse } from "axios";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ensureFreshToken } from "../../auth/auth-session";
 import {
   apiClient,
   apiRequest,
   normalizeAxiosError,
   serializeQueryParams,
 } from "../../api";
+
+vi.mock("../../auth/auth-session", () => ({
+  ensureFreshToken: vi.fn(),
+}));
+
+const mockedEnsureFreshToken = vi.mocked(ensureFreshToken);
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -72,5 +79,38 @@ describe("http-client", () => {
       url: "/health",
     });
     expect(result).toEqual({ status: "ok" });
+  });
+
+  it("attaches bearer token from auth session", async () => {
+    mockedEnsureFreshToken.mockResolvedValue("fresh-token");
+
+    let requestAuthorizationHeader: string | null = null;
+
+    await apiClient.request({
+      method: "GET",
+      url: "/health",
+      adapter: async (config) => {
+        const authHeader = AxiosHeaders.from(config.headers).get(
+          "Authorization",
+        );
+        requestAuthorizationHeader =
+          typeof authHeader === "string"
+            ? authHeader
+            : authHeader === undefined || authHeader === null
+              ? null
+              : String(authHeader);
+
+        return {
+          data: {},
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config,
+        };
+      },
+    });
+
+    expect(mockedEnsureFreshToken).toHaveBeenCalled();
+    expect(requestAuthorizationHeader).toBe("Bearer fresh-token");
   });
 });

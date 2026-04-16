@@ -57,3 +57,45 @@ p {
   margin: 0;
   color: var(--color-ink-soft);
 }
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.login-page__card {
+  width: min(100%, 30rem);
+  display: grid;
+  gap: 1rem;
+  border: 1px solid rgba(20, 33, 50, 0.12);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-soft);
+}
+
+.login-page__pill {
+  width: fit-content;
+  border: 1px solid rgba(13, 148, 136, 0.28);
+  color: #0f766e;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.login-page__button {
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font: inherit;
+  padding: 0.7rem 0.95rem;
+  cursor: pointer;
+}

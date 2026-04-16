@@ -1,12 +1,12 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { LoadingState } from "../common";
-import { useAuthState } from "../../features/auth/useAuthState";
+import { useAuth } from "../../auth";
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const { isAuthenticated, isLoading } = useAuthState();
+  const { isAuthenticated, isInitialized } = useAuth();
 
-  if (isLoading) {
+  if (!isInitialized) {
     return (
       <LoadingState
         title="Loading application"

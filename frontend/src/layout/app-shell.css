@@ -201,6 +201,28 @@
   box-shadow: 0 0 0 0.35rem rgba(15, 157, 88, 0.16);
 }
 
+.lm-shell__auth {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.lm-shell__user {
+  color: #493512;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.lm-shell__logout {
+  border: 1px solid rgba(73, 53, 18, 0.16);
+  background: #fff;
+  color: #3f3117;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .lm-shell__main {
   padding: 1.25rem;
 }
@@ -657,6 +679,10 @@
 
   .lm-shell__status {
     display: none;
+  }
+
+  .lm-shell__auth {
+    margin-left: auto;
   }
 
   .lm-shell__main {
