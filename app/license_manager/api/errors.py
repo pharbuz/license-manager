@@ -115,11 +115,11 @@ def register_exception_handlers(app: FastAPI) -> None:
             type_=RFC_9457_TYPE,
         )
 
-    @app.exception_handler(RuntimeError)
-    async def runtime_error_handler(
-        request: Request, exc: RuntimeError
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(
+        request: Request, exc: Exception
     ) -> JSONResponse:
-        logger.exception("Runtime error: %s", exc)
+        logger.exception("Unhandled application exception: %s", exc)
         return _problem_json(
             request=request,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

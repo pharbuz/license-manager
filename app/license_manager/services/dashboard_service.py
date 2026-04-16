@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from asyncio import gather
 from datetime import UTC, datetime, timedelta
 
 from fastapi import FastAPI
@@ -24,33 +23,25 @@ class DashboardService(BaseService):
         reference_time = datetime.now(tz=UTC).replace(tzinfo=None)
         expiring_threshold = reference_time + timedelta(days=30)
 
-        (
-            health,
-            active_licenses,
-            archived_licenses,
-            expiring_soon_licenses,
-            expired_licenses,
-            customers,
-            products,
-            license_kinds,
-            app_packages,
-            audit_events,
-            latest_audit_at,
-        ) = await gather(
-            HealthCheckService(self._app).get_health(),
-            self.uow.licenses.count_active_for_dashboard(),
-            self.uow.licenses.count_archived_for_dashboard(),
-            self.uow.licenses.count_expiring_soon_for_dashboard(
+        health = await HealthCheckService(self._app).get_health()
+        active_licenses = await self.uow.licenses.count_active_for_dashboard()
+        archived_licenses = await self.uow.licenses.count_archived_for_dashboard()
+        expiring_soon_licenses = (
+            await self.uow.licenses.count_expiring_soon_for_dashboard(
                 reference_time,
                 expiring_threshold,
-            ),
-            self.uow.licenses.count_expired_for_dashboard(reference_time),
-            self.uow.customers.count_for_dashboard(),
-            self.uow.products.count_for_dashboard(),
-            self.uow.kinds.count_for_dashboard(),
-            self.uow.app_packages.count_for_dashboard(),
-            self.uow.audit_logs.count_for_dashboard(),
-            self.uow.audit_logs.get_latest_occurred_at_for_dashboard(),
+            )
+        )
+        expired_licenses = await self.uow.licenses.count_expired_for_dashboard(
+            reference_time
+        )
+        customers = await self.uow.customers.count_for_dashboard()
+        products = await self.uow.products.count_for_dashboard()
+        license_kinds = await self.uow.kinds.count_for_dashboard()
+        app_packages = await self.uow.app_packages.count_for_dashboard()
+        audit_events = await self.uow.audit_logs.count_for_dashboard()
+        latest_audit_at = (
+            await self.uow.audit_logs.get_latest_occurred_at_for_dashboard()
         )
 
         attention: list[str] = []

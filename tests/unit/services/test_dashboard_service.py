@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
@@ -75,3 +76,96 @@ async def test_dashboard_service_aggregates_metrics_and_attention(
     assert "One or more infrastructure dependencies are degraded." in result.attention
     assert "3 active license(s) already expired." in result.attention
     assert "1 license(s) will expire within the next 30 days." in result.attention
+
+
+@pytest.mark.asyncio
+async def test_dashboard_service_does_not_run_repository_calls_concurrently(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def _health(*_args, **_kwargs) -> HealthCheckModel:
+        return HealthCheckModel(
+            status=HealthOverallStatus.OK,
+            services=HealthServicesModel(
+                postgres=HealthServiceStatus.OK,
+                key_vault=HealthServiceStatus.OK,
+            ),
+            errors={},
+        )
+
+    monkeypatch.setattr(
+        "app.license_manager.services.dashboard_service.HealthCheckService",
+        lambda _app: SimpleNamespace(get_health=_health),
+    )
+
+    active_calls = 0
+
+    async def _sequential(value: int | datetime) -> int | datetime:
+        nonlocal active_calls
+        if active_calls:
+            raise AssertionError("dashboard repository calls must not overlap")
+        active_calls += 1
+        try:
+            await asyncio.sleep(0)
+            return value
+        finally:
+            active_calls -= 1
+
+    async def _active_licenses() -> int:
+        return await _sequential(5)
+
+    async def _archived_licenses() -> int:
+        return await _sequential(2)
+
+    async def _expiring_soon(*_args: object) -> int:
+        return await _sequential(1)
+
+    async def _expired(*_args: object) -> int:
+        return await _sequential(3)
+
+    async def _customers() -> int:
+        return await _sequential(4)
+
+    async def _products() -> int:
+        return await _sequential(6)
+
+    async def _kinds() -> int:
+        return await _sequential(7)
+
+    async def _app_packages() -> int:
+        return await _sequential(8)
+
+    async def _audit_events() -> int:
+        return await _sequential(9)
+
+    async def _latest_audit_at() -> datetime:
+        return await _sequential(datetime(2026, 4, 16, 10, 0, tzinfo=UTC))
+
+    fake_uow = SimpleNamespace(
+        licenses=SimpleNamespace(
+            count_active_for_dashboard=AsyncMock(side_effect=_active_licenses),
+            count_archived_for_dashboard=AsyncMock(side_effect=_archived_licenses),
+            count_expiring_soon_for_dashboard=AsyncMock(side_effect=_expiring_soon),
+            count_expired_for_dashboard=AsyncMock(side_effect=_expired),
+        ),
+        customers=SimpleNamespace(
+            count_for_dashboard=AsyncMock(side_effect=_customers)
+        ),
+        products=SimpleNamespace(count_for_dashboard=AsyncMock(side_effect=_products)),
+        kinds=SimpleNamespace(count_for_dashboard=AsyncMock(side_effect=_kinds)),
+        app_packages=SimpleNamespace(
+            count_for_dashboard=AsyncMock(side_effect=_app_packages)
+        ),
+        audit_logs=SimpleNamespace(
+            count_for_dashboard=AsyncMock(side_effect=_audit_events),
+            get_latest_occurred_at_for_dashboard=AsyncMock(
+                side_effect=_latest_audit_at
+            ),
+        ),
+    )
+
+    service = DashboardService(fake_uow, FastAPI())
+
+    result = await service.get_dashboard()
+
+    assert result.metrics.active_licenses == 5
+    assert result.metrics.audit_events == 9
