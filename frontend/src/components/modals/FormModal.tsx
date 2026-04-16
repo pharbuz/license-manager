@@ -7,8 +7,14 @@ export type FormFieldType =
   | "email"
   | "number"
   | "checkbox"
+  | "select"
   | "textarea"
   | "datetime-local";
+
+export type FormFieldOption = {
+  label: string;
+  value: string;
+};
 
 export type FormFieldConfig<TValues extends Record<string, unknown>> = {
   name: keyof TValues & string;
@@ -17,6 +23,7 @@ export type FormFieldConfig<TValues extends Record<string, unknown>> = {
   required?: boolean;
   placeholder?: string;
   helpText?: string;
+  options?: FormFieldOption[];
 };
 
 type FormModalProps<TValues extends Record<string, unknown>> = {
@@ -101,6 +108,23 @@ export function FormModal<TValues extends Record<string, unknown>>({
                     updateField(field.name, event.target.checked)
                   }
                 />
+              ) : type === "select" ? (
+                <select
+                  value={String(value)}
+                  required={field.required}
+                  onChange={(event) =>
+                    updateField(field.name, event.target.value)
+                  }
+                >
+                  <option value="">
+                    {field.placeholder ?? "Select an option"}
+                  </option>
+                  {field.options?.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <input
                   type={type}

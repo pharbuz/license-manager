@@ -4,13 +4,7 @@ import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DashboardPage } from "../../pages/DashboardPage";
 import * as services from "../../services";
-import type {
-  AppPackage,
-  AuditLogEntry,
-  Customer,
-  License,
-  Product,
-} from "../../types";
+import type { DashboardOverview } from "../../types";
 
 function renderWithQueryClient(ui: ReactElement) {
   const queryClient = new QueryClient({
@@ -27,121 +21,31 @@ afterEach(() => {
 });
 
 describe("DashboardPage", () => {
-  it("renders operational metrics from runtime endpoints", async () => {
-    vi.spyOn(services, "getHealth").mockResolvedValue({
-      status: "ok",
-      services: { postgres: "ok", keyVault: "ok" },
-    });
-
-    vi.spyOn(services, "listLicenses").mockResolvedValue([
-      {
-        id: "license-1",
-        customerId: "customer-1",
-        productId: "product-1",
-        kindId: "kind-1",
-        licenseCount: 10,
-        licenseState: "active",
-        licenseKey: "KEY-1",
-        licenseEmail: "ops@acme.com",
-        doubleSend: false,
-        beginDate: "2026-03-01T00:00:00.000Z",
-        endDate: "2026-04-20T00:00:00.000Z",
-        notificationDate: "2026-04-18T00:00:00.000Z",
-        createdAt: "2026-03-01T00:00:00.000Z",
-        modifiedAt: "2026-03-01T00:00:00.000Z",
+  it("renders operational metrics from the dashboard endpoint", async () => {
+    vi.spyOn(services, "getDashboardOverview").mockResolvedValue({
+      health: {
+        status: "ok",
+        services: { postgres: "ok", keyVault: "ok" },
       },
-      {
-        id: "license-2",
-        customerId: "customer-1",
-        productId: "product-1",
-        kindId: "kind-1",
-        licenseCount: 3,
-        licenseState: "active",
-        licenseKey: "KEY-2",
-        licenseEmail: "ops@acme.com",
-        doubleSend: false,
-        beginDate: "2026-02-01T00:00:00.000Z",
-        endDate: "2026-03-01T00:00:00.000Z",
-        notificationDate: "2026-02-15T00:00:00.000Z",
-        createdAt: "2026-02-01T00:00:00.000Z",
-        modifiedAt: "2026-02-01T00:00:00.000Z",
+      metrics: {
+        activeLicenses: 2,
+        archivedLicenses: 1,
+        expiringSoonLicenses: 1,
+        expiredLicenses: 1,
+        customers: 1,
+        products: 1,
+        licenseKinds: 1,
+        appPackages: 1,
+        auditEvents: 1,
       },
-    ] satisfies License[]);
-
-    vi.spyOn(services, "listArchivedLicenses").mockResolvedValue([
-      {
-        id: "license-archived",
-        customerId: null,
-        productId: null,
-        kindId: null,
-        licenseCount: 1,
-        licenseState: "archived",
-        licenseKey: "ARCHIVED-1",
-        licenseEmail: "archived@acme.com",
-        doubleSend: false,
-        beginDate: "2025-01-01T00:00:00.000Z",
-        endDate: "2025-12-31T00:00:00.000Z",
-        notificationDate: "2025-12-01T00:00:00.000Z",
-        createdAt: "2025-01-01T00:00:00.000Z",
-        modifiedAt: "2025-01-01T00:00:00.000Z",
-      },
-    ] satisfies License[]);
-
-    vi.spyOn(services, "listCustomers").mockResolvedValue([
-      {
-        id: "customer-1",
-        name: "Acme",
-        contactPersonName: null,
-        contactPersonPhone: null,
-        email: "ops@acme.com",
-        notificationsEnabled: true,
-        gemFuryUsed: true,
-        customerSymbol: "ACME",
-        createdAt: "2026-03-01T00:00:00.000Z",
-        modifiedAt: "2026-03-01T00:00:00.000Z",
-      },
-    ] satisfies Customer[]);
-
-    vi.spyOn(services, "listProducts").mockResolvedValue([
-      {
-        id: "product-1",
-        name: "Gateway",
-        kind: "core",
-        createdAt: "2026-03-01T00:00:00.000Z",
-        modifiedAt: "2026-03-01T00:00:00.000Z",
-      },
-    ] satisfies Product[]);
-
-    vi.spyOn(services, "listAppPackages").mockResolvedValue([
-      {
-        id: "package-1",
-        versionNumber: "1.0.0",
-        binaryName: "gateway.zip",
-        gemFuryUrl: "https://example.com/gem",
-        binaryUrl: "https://example.com/binary",
-        createdAt: "2026-03-01T00:00:00.000Z",
-        modifiedAt: "2026-03-01T00:00:00.000Z",
-      },
-    ] satisfies AppPackage[]);
-
-    vi.spyOn(services, "listAuditLogs").mockResolvedValue([
-      {
-        id: "audit-1",
-        actorId: "user-1",
-        actorType: "user",
-        actorDisplayName: "Ops User",
-        source: "ui",
-        requestId: "request-1",
-        action: "license.updated",
-        entityType: "license",
-        entityId: "license-1",
-        summary: "Updated license",
-        diff: null,
-        metadata: null,
-        occurredAt: "2026-04-15T06:00:00.000Z",
-        recordedAt: "2026-04-15T06:00:00.000Z",
-      },
-    ] satisfies AuditLogEntry[]);
+      serviceStates: [
+        { name: "PostgreSQL", status: "ok" },
+        { name: "Key Vault", status: "ok" },
+      ],
+      attention: ["1 active license(s) already expired."],
+      latestAuditAt: "2026-04-15T06:00:00.000Z",
+      refreshedAt: "2026-04-16T06:00:00.000Z",
+    } satisfies DashboardOverview);
 
     renderWithQueryClient(<DashboardPage />);
 
@@ -160,18 +64,11 @@ describe("DashboardPage", () => {
   });
 
   it("renders an error state when dashboard data fetch fails", async () => {
-    vi.spyOn(services, "getHealth").mockRejectedValue({
-      message: "Health endpoint is unavailable",
+    vi.spyOn(services, "getDashboardOverview").mockRejectedValue({
+      message: "Dashboard endpoint is unavailable",
       status: 503,
       code: "SERVICE_UNAVAILABLE",
     });
-
-    vi.spyOn(services, "listLicenses").mockResolvedValue([]);
-    vi.spyOn(services, "listArchivedLicenses").mockResolvedValue([]);
-    vi.spyOn(services, "listCustomers").mockResolvedValue([]);
-    vi.spyOn(services, "listProducts").mockResolvedValue([]);
-    vi.spyOn(services, "listAppPackages").mockResolvedValue([]);
-    vi.spyOn(services, "listAuditLogs").mockResolvedValue([]);
 
     renderWithQueryClient(<DashboardPage />);
 
@@ -179,7 +76,7 @@ describe("DashboardPage", () => {
       await screen.findByRole("heading", { name: "Unable to load dashboard" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Health endpoint is unavailable"),
+      screen.getByText("Dashboard endpoint is unavailable"),
     ).toBeInTheDocument();
   });
 });

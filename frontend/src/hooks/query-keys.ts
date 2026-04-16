@@ -5,6 +5,10 @@ export const queryKeys = {
     all: ["dashboard"] as const,
     overview: () => [...queryKeys.dashboard.all, "overview"] as const,
   },
+  dropdowns: {
+    all: ["dropdowns"] as const,
+    list: (type: string) => [...queryKeys.dropdowns.all, "list", type] as const,
+  },
   customers: {
     all: ["customers"] as const,
     list: (params?: ListQueryParams) =>

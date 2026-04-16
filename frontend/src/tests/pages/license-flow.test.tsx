@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as services from "../../services";
@@ -40,6 +41,10 @@ describe("LicensesPage", () => {
     } satisfies License;
 
     vi.spyOn(services, "listLicenses").mockResolvedValue([license]);
+    vi.spyOn(services, "listDropdownItems")
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
 
     renderWithQueryClient(<LicensesPage />);
 
@@ -50,5 +55,35 @@ describe("LicensesPage", () => {
     expect(
       screen.getByRole("button", { name: "Generate key" }),
     ).toBeInTheDocument();
+  });
+
+  it("uses dropdown-backed selects in the license editor", async () => {
+    const user = userEvent.setup();
+
+    vi.spyOn(services, "listLicenses").mockResolvedValue([]);
+    vi.spyOn(services, "listDropdownItems")
+      .mockResolvedValueOnce([{ id: "customer-1", text: "ACM - Acme" }])
+      .mockResolvedValueOnce([{ id: "product-1", text: "Gateway" }])
+      .mockResolvedValueOnce([{ id: "kind-1", text: "Trial" }]);
+
+    renderWithQueryClient(<LicensesPage />);
+
+    await user.click(
+      await screen.findByRole("button", { name: "Add license" }),
+    );
+
+    expect(await screen.findByLabelText("Customer")).toHaveDisplayValue(
+      "Select customer",
+    );
+    expect(screen.getByLabelText("Product")).toHaveDisplayValue(
+      "Select product",
+    );
+    expect(screen.getByLabelText("License kind")).toHaveDisplayValue(
+      "Select license kind",
+    );
+
+    await user.selectOptions(screen.getByLabelText("Customer"), "customer-1");
+
+    expect(screen.getByLabelText("Customer")).toHaveValue("customer-1");
   });
 });

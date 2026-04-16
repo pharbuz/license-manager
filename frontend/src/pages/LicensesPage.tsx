@@ -3,17 +3,20 @@ import { useMemo, useState } from "react";
 import type { ApiError } from "../api";
 import { ConfirmDialog, FormModal, Modal } from "../components/modals";
 import { ResourceListPage } from "../components/views/ResourceListPage";
+import { queryKeys } from "../hooks/query-keys";
 import { toDateTimeLocalValue, toIsoDateTimeValue } from "../utils/dates";
 import {
   archiveLicense,
   createLicense,
   deleteLicense,
   generateLicense,
+  listDropdownItems,
   listLicenses,
   updateLicense,
 } from "../services";
 import type {
   CollectionPage,
+  DropdownItem,
   License,
   LicenseCreateInput,
   LicenseGenerateInput,
@@ -86,6 +89,18 @@ export function LicensesPage() {
     queryKey: ["licenses"],
     queryFn: () => listLicenses(),
   });
+  const customerOptionsQuery = useQuery<DropdownItem[], ApiError>({
+    queryKey: queryKeys.dropdowns.list("customer"),
+    queryFn: () => listDropdownItems("customer"),
+  });
+  const productOptionsQuery = useQuery<DropdownItem[], ApiError>({
+    queryKey: queryKeys.dropdowns.list("product"),
+    queryFn: () => listDropdownItems("product"),
+  });
+  const kindOptionsQuery = useQuery<DropdownItem[], ApiError>({
+    queryKey: queryKeys.dropdowns.list("license kind"),
+    queryFn: () => listDropdownItems("license kind"),
+  });
 
   const createMutation = useMutation({
     mutationFn: (payload: LicenseCreateInput) => createLicense(payload),
@@ -154,6 +169,38 @@ export function LicensesPage() {
     return defaultLicenseValues;
   }, [dialog]);
 
+  const customerOptions = useMemo(
+    () => customerOptionsQuery.data ?? [],
+    [customerOptionsQuery.data],
+  );
+  const productOptions = useMemo(
+    () => productOptionsQuery.data ?? [],
+    [productOptionsQuery.data],
+  );
+  const kindOptions = useMemo(
+    () => kindOptionsQuery.data ?? [],
+    [kindOptionsQuery.data],
+  );
+  const customerLabelById = useMemo(
+    () => new Map(customerOptions.map((item) => [item.id, item.text])),
+    [customerOptions],
+  );
+  const productLabelById = useMemo(
+    () => new Map(productOptions.map((item) => [item.id, item.text])),
+    [productOptions],
+  );
+  const kindLabelById = useMemo(
+    () => new Map(kindOptions.map((item) => [item.id, item.text])),
+    [kindOptions],
+  );
+  const dropdownHelpText = [
+    customerOptionsQuery.isError ? customerOptionsQuery.error?.message : null,
+    productOptionsQuery.isError ? productOptionsQuery.error?.message : null,
+    kindOptionsQuery.isError ? kindOptionsQuery.error?.message : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   const pagination: CollectionPage<License> | undefined = query.data
     ? buildCollectionPage({
         items: query.data,
@@ -167,6 +214,9 @@ export function LicensesPage() {
           license.customerId,
           license.productId,
           license.kindId,
+          license.customerId ? customerLabelById.get(license.customerId) : "",
+          license.productId ? productLabelById.get(license.productId) : "",
+          license.kindId ? kindLabelById.get(license.kindId) : "",
         ],
       })
     : undefined;
@@ -268,9 +318,37 @@ export function LicensesPage() {
               description="Capture the license record and lifecycle dates."
               initialValues={dialogValues}
               fields={[
-                { name: "customerId", label: "Customer ID" },
-                { name: "productId", label: "Product ID" },
-                { name: "kindId", label: "Kind ID" },
+                {
+                  name: "customerId",
+                  label: "Customer",
+                  type: "select",
+                  placeholder: "Select customer",
+                  options: customerOptions.map((item) => ({
+                    label: item.text,
+                    value: item.id,
+                  })),
+                  helpText: dropdownHelpText || undefined,
+                },
+                {
+                  name: "productId",
+                  label: "Product",
+                  type: "select",
+                  placeholder: "Select product",
+                  options: productOptions.map((item) => ({
+                    label: item.text,
+                    value: item.id,
+                  })),
+                },
+                {
+                  name: "kindId",
+                  label: "License kind",
+                  type: "select",
+                  placeholder: "Select license kind",
+                  options: kindOptions.map((item) => ({
+                    label: item.text,
+                    value: item.id,
+                  })),
+                },
                 {
                   name: "licenseCount",
                   label: "License count",
@@ -338,15 +416,30 @@ export function LicensesPage() {
                 </div>
                 <div>
                   <dt>Customer</dt>
-                  <dd>{viewLicense.customerId ?? "-"}</dd>
+                  <dd>
+                    {viewLicense.customerId
+                      ? (customerLabelById.get(viewLicense.customerId) ??
+                        viewLicense.customerId)
+                      : "-"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Product</dt>
-                  <dd>{viewLicense.productId ?? "-"}</dd>
+                  <dd>
+                    {viewLicense.productId
+                      ? (productLabelById.get(viewLicense.productId) ??
+                        viewLicense.productId)
+                      : "-"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Kind</dt>
-                  <dd>{viewLicense.kindId ?? "-"}</dd>
+                  <dd>
+                    {viewLicense.kindId
+                      ? (kindLabelById.get(viewLicense.kindId) ??
+                        viewLicense.kindId)
+                      : "-"}
+                  </dd>
                 </div>
               </dl>
             </Modal>

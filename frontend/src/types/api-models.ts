@@ -230,3 +230,32 @@ export type HealthResponse = {
   services: HealthServices;
   errors?: Record<string, string>;
 };
+
+export type DropdownType = "customer" | "license kind" | "product";
+
+export type DropdownItem = {
+  id: Uuid;
+  text: string;
+};
+
+export type DashboardOverview = {
+  health: HealthResponse;
+  metrics: {
+    activeLicenses: number;
+    archivedLicenses: number;
+    expiringSoonLicenses: number;
+    expiredLicenses: number;
+    customers: number;
+    products: number;
+    licenseKinds: number;
+    appPackages: number;
+    auditEvents: number;
+  };
+  serviceStates: Array<{
+    name: string;
+    status: "ok" | "error";
+  }>;
+  attention: string[];
+  latestAuditAt: string | null;
+  refreshedAt: string;
+};
