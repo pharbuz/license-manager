@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { navItems } from "../app/routes";
 import { useAuth } from "../auth";
+import { PageTransition } from "../components/common";
 import { getHealth } from "../services";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { UserMenu } from "./UserMenu";
@@ -310,7 +311,9 @@ export function AppShell() {
         </header>
 
         <main className="min-h-[calc(100vh-73px)]">
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
     </div>
