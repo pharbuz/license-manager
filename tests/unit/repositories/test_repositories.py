@@ -17,6 +17,7 @@ from app.license_manager.db.models import (
     Setting,
 )
 from app.license_manager.repositories.app_packages import AppPackagesRepository
+from app.license_manager.repositories.audit_logs import AuditLogsRepository
 from app.license_manager.repositories.customers import CustomersRepository
 from app.license_manager.repositories.kinds import KindsRepository
 from app.license_manager.repositories.licenses import LicensesRepository
@@ -62,6 +63,23 @@ async def test_customers_repository_get_by_symbol_executes_query(
 
 
 @pytest.mark.asyncio
+async def test_customers_repository_list_dropdown_items_returns_rows(
+    mock_session: Mock,
+) -> None:
+    customer_id = uuid4()
+    mock_session.execute.return_value = Mock(
+        all=Mock(return_value=[(customer_id, "ACM", "Acme")])
+    )
+
+    repository = CustomersRepository(session=mock_session)
+    rows = await repository.list_dropdown_items()
+
+    assert rows == [(customer_id, "ACM", "Acme")]
+    stmt = mock_session.execute.call_args.args[0]
+    assert isinstance(stmt, Select)
+
+
+@pytest.mark.asyncio
 async def test_kinds_repository_get_by_name_executes_query(mock_session: Mock) -> None:
     kind = Kind(
         id=uuid4(),
@@ -77,6 +95,18 @@ async def test_kinds_repository_get_by_name_executes_query(mock_session: Mock) -
     fetched = await repository.get_by_name("Trial")
 
     assert fetched is kind
+
+
+@pytest.mark.asyncio
+async def test_kinds_repository_count_for_dashboard_returns_scalar(
+    mock_session: Mock,
+) -> None:
+    mock_session.execute.return_value = Mock(scalar_one=Mock(return_value=4))
+
+    repository = KindsRepository(session=mock_session)
+    count = await repository.count_for_dashboard()
+
+    assert count == 4
 
 
 @pytest.mark.asyncio
@@ -98,6 +128,21 @@ async def test_products_repository_get_by_name_executes_query(
     fetched = await repository.get_by_name("LicenseManager")
 
     assert fetched is product
+
+
+@pytest.mark.asyncio
+async def test_products_repository_list_dropdown_items_returns_rows(
+    mock_session: Mock,
+) -> None:
+    product_id = uuid4()
+    mock_session.execute.return_value = Mock(
+        all=Mock(return_value=[(product_id, "Gateway")])
+    )
+
+    repository = ProductsRepository(session=mock_session)
+    rows = await repository.list_dropdown_items()
+
+    assert rows == [(product_id, "Gateway")]
 
 
 @pytest.mark.asyncio
@@ -132,6 +177,18 @@ async def test_licenses_repository_list_by_customer_id_returns_rows(
 
 
 @pytest.mark.asyncio
+async def test_licenses_repository_count_active_for_dashboard_returns_scalar(
+    mock_session: Mock,
+) -> None:
+    mock_session.execute.return_value = Mock(scalar_one=Mock(return_value=9))
+
+    repository = LicensesRepository(session=mock_session)
+    count = await repository.count_active_for_dashboard()
+
+    assert count == 9
+
+
+@pytest.mark.asyncio
 async def test_app_packages_repository_get_by_version_number_executes_query(
     mock_session: Mock,
 ) -> None:
@@ -152,6 +209,21 @@ async def test_app_packages_repository_get_by_version_number_executes_query(
     fetched = await repository.get_by_version_number("1.0.0")
 
     assert fetched is app_package
+
+
+@pytest.mark.asyncio
+async def test_audit_logs_repository_latest_occurrence_returns_first_scalar(
+    mock_session: Mock,
+) -> None:
+    occurred_at = datetime(2026, 1, 2, 0, 0, 0)
+    mock_session.execute.return_value = Mock(
+        scalars=Mock(return_value=Mock(first=Mock(return_value=occurred_at)))
+    )
+
+    repository = AuditLogsRepository(session=mock_session)
+    latest = await repository.get_latest_occurred_at_for_dashboard()
+
+    assert latest == occurred_at
 
 
 @pytest.mark.asyncio

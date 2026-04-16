@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.license_manager.core.helpers import parse_semantic_version
@@ -30,3 +30,7 @@ class AppPackagesRepository(BaseRepository[AppPackage]):
         if not versions:
             return "0.0.0"
         return max(versions, key=parse_semantic_version)
+
+    async def count_for_dashboard(self) -> int:
+        stmt = select(func.count(AppPackage.id))
+        return int((await self.session.execute(stmt)).scalar_one())

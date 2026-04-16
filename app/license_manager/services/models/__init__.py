@@ -11,6 +11,8 @@ from .background_jobs import (
     LicenseCheckTaskResult,
 )
 from .customers import CustomerCreateDto, CustomerDto, CustomerUpdateDto
+from .dashboard import DashboardDto, DashboardMetricsDto, DashboardServiceStateDto
+from .dropdowns import DropdownItemDto, DropdownType
 from .email_notifications import EmailAttachment
 from .kinds import KindCreateDto, KindDto, KindUpdateDto
 from .licenses import LicenseCreateDto, LicenseDto, LicenseUpdateDto
@@ -36,6 +38,11 @@ __all__ = [
     "CustomerDto",
     "CustomerCreateDto",
     "CustomerUpdateDto",
+    "DashboardDto",
+    "DashboardMetricsDto",
+    "DashboardServiceStateDto",
+    "DropdownItemDto",
+    "DropdownType",
     "KindDto",
     "KindCreateDto",
     "KindUpdateDto",

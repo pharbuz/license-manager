@@ -22,6 +22,8 @@ from app.license_manager.api.v1.routers import (
     app_packages_router,
     audit_logs_router,
     customers_router,
+    dashboard_router,
+    dropdown_router,
     kinds_router,
     licenses_router,
     products_router,
@@ -67,6 +69,14 @@ TAGS_METADATA = [
     {
         "name": "AuditLogs",
         "description": "Audit trail of write operations.",
+    },
+    {
+        "name": "Dropdown",
+        "description": "Dropdown data sources for frontend form selectors.",
+    },
+    {
+        "name": "Dashboard",
+        "description": "Aggregated operational metrics for the dashboard view.",
     },
 ]
 
@@ -166,6 +176,8 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(audit_logs_router)
     app.include_router(customers_router)
+    app.include_router(dashboard_router)
+    app.include_router(dropdown_router)
     app.include_router(kinds_router)
     app.include_router(licenses_router)
     app.include_router(products_router)

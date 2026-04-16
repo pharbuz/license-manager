@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import Date, cast, select, update
+from sqlalchemy import Date, cast, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.license_manager.db.models import Customer, License, Product
@@ -83,3 +83,34 @@ class LicensesRepository(BaseRepository[License]):
             )
         )
         return list((await self.session.execute(stmt)).all())
+
+    async def count_active_for_dashboard(self) -> int:
+        stmt = select(func.count(License.id)).where(
+            func.lower(License.license_state) == "active"
+        )
+        return int((await self.session.execute(stmt)).scalar_one())
+
+    async def count_archived_for_dashboard(self) -> int:
+        stmt = select(func.count(License.id)).where(
+            func.lower(License.license_state) == "archived"
+        )
+        return int((await self.session.execute(stmt)).scalar_one())
+
+    async def count_expired_for_dashboard(self, reference_time: datetime) -> int:
+        stmt = select(func.count(License.id)).where(
+            func.lower(License.license_state) == "active",
+            License.end_date < reference_time,
+        )
+        return int((await self.session.execute(stmt)).scalar_one())
+
+    async def count_expiring_soon_for_dashboard(
+        self,
+        reference_time: datetime,
+        threshold: datetime,
+    ) -> int:
+        stmt = select(func.count(License.id)).where(
+            func.lower(License.license_state) == "active",
+            License.end_date >= reference_time,
+            License.end_date <= threshold,
+        )
+        return int((await self.session.execute(stmt)).scalar_one())

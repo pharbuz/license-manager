@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.license_manager.db.models import Kind
@@ -22,3 +22,11 @@ class KindsRepository(BaseRepository[Kind]):
         stmt = select(Kind).where(Kind.name == name)
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def list_dropdown_items(self) -> list[tuple[UUID, str]]:
+        stmt = select(Kind.id, Kind.name).order_by(Kind.name.asc())
+        return list((await self.session.execute(stmt)).all())
+
+    async def count_for_dashboard(self) -> int:
+        stmt = select(func.count(Kind.id))
+        return int((await self.session.execute(stmt)).scalar_one())

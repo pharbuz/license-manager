@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.license_manager.db.models import Customer
@@ -22,3 +22,14 @@ class CustomersRepository(BaseRepository[Customer]):
         stmt = select(Customer).where(Customer.customer_symbol == customer_symbol)
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def list_dropdown_items(self) -> list[tuple[UUID, str, str]]:
+        stmt = select(Customer.id, Customer.customer_symbol, Customer.name).order_by(
+            Customer.customer_symbol.asc(),
+            Customer.name.asc(),
+        )
+        return list((await self.session.execute(stmt)).all())
+
+    async def count_for_dashboard(self) -> int:
+        stmt = select(func.count(Customer.id))
+        return int((await self.session.execute(stmt)).scalar_one())
