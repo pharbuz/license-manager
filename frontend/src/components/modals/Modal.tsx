@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 type ModalProps = {
   title: string;
@@ -8,7 +10,28 @@ type ModalProps = {
 };
 
 export function Modal({ title, description, children, onClose }: ModalProps) {
-  return (
+  const isBrowser = typeof document !== "undefined";
+
+  useEffect(() => {
+    if (!isBrowser) {
+      return;
+    }
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [isBrowser]);
+
+  if (!isBrowser) {
+    return null;
+  }
+
+  const portalRoot = document.body;
+
+  return createPortal(
     <div className="lm-modal__backdrop" role="presentation" onClick={onClose}>
       <div
         className="lm-modal"
@@ -32,6 +55,7 @@ export function Modal({ title, description, children, onClose }: ModalProps) {
 
         <div className="lm-modal__body">{children}</div>
       </div>
-    </div>
+    </div>,
+    portalRoot,
   );
 }
