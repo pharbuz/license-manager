@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { navItems } from "../app/routes";
 import { useAuth } from "../auth";
-import { PageTransition } from "../components/common";
+import { ErrorBoundary, PageTransition } from "../components/common";
 import { getHealth } from "../services";
 import {
   applyDarkModeClass,
@@ -296,7 +296,14 @@ export function AppShell() {
 
         <main className="min-h-[calc(100vh-73px)]">
           <PageTransition>
-            <Outlet />
+            <ErrorBoundary
+              fullScreen={false}
+              homePath="/"
+              title="Page rendering failed"
+              description="This section crashed while rendering. Retry the current route or go back to the dashboard."
+            >
+              <Outlet />
+            </ErrorBoundary>
           </PageTransition>
         </main>
       </div>

@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "../components/auth/ProtectedRoute";
+import { ErrorBoundary } from "../components/common";
 import { AppShell } from "../layout/AppShell";
 import { ArchivedLicensesPage } from "../pages/ArchivedLicensesPage";
 import { AppPackagesPage } from "../pages/AppPackagesPage";
@@ -33,7 +34,15 @@ export const navItems: NavItem[] = [
 export const appRouter = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <ErrorBoundary
+        homePath="/login"
+        title="Login screen failed"
+        description="The sign-in view could not be rendered. Retry it or reload the login route."
+      >
+        <LoginPage />
+      </ErrorBoundary>
+    ),
   },
   {
     path: "/",
